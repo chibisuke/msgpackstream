@@ -1,0 +1,130 @@
+export class StringTable {
+    compressor = Compressor;
+}
+
+
+class Compressor {
+
+    private compressData: boolean;
+
+    private streamTable: Map<string|number, number> = new Map();
+    private stidx = 1;
+    private _stidx = 1;
+
+    private packetTable: Map<string|number, number> = new Map();
+    private idx = 1;
+
+    private result: [any, { [id: number]: string|number }] = [{}, {}];
+
+    constructor (compressData: boolean = false) {
+        this.compressData = compressData;
+    }
+
+    public compress(data: any): string {
+
+        console.log('orig:', JSON.stringify(data).length);
+
+        this.result = [{}, {}];
+        this.packetTable = new Map();
+        this.idx = 1;
+        this._stidx = this.stidx;
+
+        this.result[0] = this._compress(data);
+
+        console.log('result:', JSON.stringify(this.result[0]).length);
+
+        const t: { [id: number]: string|number } = {};
+        if (this.idx > 1) {
+            this.packetTable.forEach((k, v) => {
+                t[k] = v;
+            })
+        }
+        if (this.stidx > this._stidx) {
+            this.streamTable.forEach((k, v) => {
+                if (k >= this._stidx)
+                    t[-k] = v;
+            })
+        }
+        this.result[1] = t;
+        //console.log(this.result);
+        return JSON.stringify(this.result);
+    }
+
+    private _compress(data: any): any {
+        if (data instanceof Array)
+            return this._compress_array(data);
+        else if (typeof data === 'object')
+            return this._compress_object(data);
+        else 
+            return this._compress_value(data);
+    }
+
+    private _compress_array(data: Array<any>) {
+        //console.log('array:', data);
+        const ret: any[] = [];
+        data.forEach(x => {
+            ret.push(this._compress(x));
+        })
+        return ret;
+    }
+
+    private _compress_object(data: any) {
+        //console.log('object:', data);
+        const ret: any = {};
+        Object.keys(data).forEach(key => {
+            let k = 0;
+            if (this.streamTable.has(key)) {
+                k = this.streamTable.get(key)!;
+            } else {
+                k = this.stidx++;
+                this.streamTable.set(key, k);
+            }
+            ret[-k] = this._compress(data[key]);
+        });
+        return ret;
+    }
+
+    private _compress_value(data: any) {
+        if (!this.compressData)
+            return data;
+
+        let k = 0;
+        if (this.streamTable.has(data)) {
+            k = -this.streamTable.get(data)!;
+        } else if (this.packetTable.has(data)) {
+            k = this.packetTable.get(data)!;
+        } else {
+            k = this.idx++;
+            this.packetTable.set(data, k);
+        }
+        //console.log('value:', data);
+        return k;
+    }
+
+}
+
+const data = {
+    test: 123,
+    zeux: {
+        a: 1,
+        b: 2,
+        komischeKeyMitVielUndSo: 42
+    },
+    mehr: [5, 6, 7],
+    child: {
+        zeux: {
+            a: 9,
+            b: 10,
+            c: 11,
+            komischeKeyMitVielUndSo: 42
+        },
+        test: false
+    }
+}
+
+const a = new Compressor(true);
+const b = a.compress(data);
+console.log(b);
+(<any>data).senf = 'zeux';
+const c = a.compress(data);
+console.log(c);

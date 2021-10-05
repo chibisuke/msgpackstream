@@ -1,0 +1,7 @@
+   ticks  total  nonlib   name
+    366    7.1%   99.5%  JavaScript
+      0    0.0%    0.0%  C++
+    214    4.2%   58.2%  GC
+   4768   92.8%          Shared libraries
+
+   
