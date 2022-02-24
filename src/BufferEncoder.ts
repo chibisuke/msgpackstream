@@ -92,6 +92,34 @@ export class BufferEncoder extends BufferBuilder {
         }
     }
 
+    public prependExtHeader(type: number, size: number) {
+        const fixext: {[key: number]: number} = {
+            1: 0xd4,
+            2: 0xd5,
+            4: 0xd6,
+            8: 0xd7,
+           16: 0xd8
+        };
+        if(fixext[size]) {
+            this.prependOne(type);
+            this.prependOne(fixext[size]);            
+        } else if(size < 0x100) {
+            this.prependOne(type);
+            this.prependOne(size);
+            this.prependOne(0xc7);
+        } else if(size < 0x10000) {
+            this.scratch[0] = 0xc8;
+            this.scratchDataView.setUint16(1, size);
+            this.scratch[3] = type;
+            this.prependBuffer(this.scratch, 4)
+        } else {
+            this.scratch[0] = 0xc9;
+            this.scratchDataView.setUint32(1, size);
+            this.scratch[5] = type;
+            this.prependBuffer(this.scratch, 6);
+        }
+    }
+
     public encodeExtHeader(type: number, size: number) {
         const fixext: {[key: number]: number} = {
             1: 0xd4,
@@ -101,7 +129,7 @@ export class BufferEncoder extends BufferBuilder {
            16: 0xd8
         };
         if(fixext[size]) {
-            this.appendOne(fixext[size]);
+            this.appendOne(fixext[size]);            
             this.appendOne(type);
         } else if(size < 0x100) {
             this.appendOne(0xc7);
@@ -144,6 +172,27 @@ export class BufferEncoder extends BufferBuilder {
             this.appendBuffer(this.scratch, 12);
         }
         
+    }
+
+    public prependUint(data: number) {
+        if(data < 0x80) {
+            this.prependOne(data);
+        } else if(data < 0x100) {
+            this.prependOne(data);
+            this.prependOne(0xcc);
+        } else if(data < 0x10000) {
+            this.scratch[0] = 0xcd;
+            this.scratchDataView.setUint16(1, data);
+            return this.prependBuffer(this.scratch, 3);
+        } else if(data < 0x100000000) {
+            this.scratch[0] = 0xce;
+            this.scratchDataView.setUint32(1, data)
+            return this.prependBuffer(this.scratch, 5);               
+        } else {
+            this.scratch[0] = 0xcf;
+            this.scratchDataView.setBigUint64(1, BigInt(data));
+            return this.prependBuffer(this.scratch, 9);        
+        }
     }
 
     private encodeInt(data: number) {

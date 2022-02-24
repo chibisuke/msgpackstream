@@ -2,6 +2,7 @@ export class BufferBuilder {
     protected buffer = new ArrayBuffer(0);
     protected bufferView = new Uint8Array(this.buffer);
     public cursor = 0;
+    public startOffset = 0;
 
     get length() {
         return this.cursor;
@@ -11,7 +12,7 @@ export class BufferBuilder {
     }
 
     result() {
-        return this.bufferView.subarray(0, this.cursor);
+        return this.bufferView.subarray(this.startOffset, this.cursor);
     }
 
     checkAvailableSize(size: number) {
@@ -40,10 +41,18 @@ export class BufferBuilder {
         }
         return this.appendBuffer(this.bufferView, this.cursor);
     }
+
+    prependBuffer(value: Uint8Array, length: number = value.length) {
+      this.bufferView.set(value, this.startOffset -= length);
+    }
     
     appendOne(value: number) {
-        this.checkAvailableSize(1);
-        this.bufferView[this.cursor++] = value;
+      this.checkAvailableSize(1);
+      this.bufferView[this.cursor++] = value;
+    }
+
+    prependOne(value: number) {
+      this.bufferView[--this.startOffset] = value;
     }
 
     protected utf8Length(str: string) {
