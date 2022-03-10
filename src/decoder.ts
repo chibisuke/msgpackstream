@@ -210,7 +210,6 @@ export class MsgPackDecoder {
                 throw new Error('PacketTable is not an array');
         }
         this.cursor = payloadStart;
-        console.log(this.streamTable);
         this.isInStreamExt = true;
         const payload = this.decodeNext();
         this.isInStreamExt = false;
