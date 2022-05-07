@@ -35,7 +35,7 @@ export class BufferBuilder {
                 value = value.subarray(0, length);
                 //value = new Uint8Array(value.buffer, value.byteOffset, length);
             this.checkAvailableSize(value.length);
-            this.bufferView.set(value, this.cursor)
+            this.bufferView.set(value, this.cursor);
             this.cursor += value.length;
             return; 
         }
@@ -43,7 +43,7 @@ export class BufferBuilder {
     }
 
     prependBuffer(value: Uint8Array, length: number = value.length) {
-      this.bufferView.set(value, this.startOffset -= length);
+      this.bufferView.set(value.subarray(0, length), this.startOffset -= length);
     }
     
     appendOne(value: number) {
