@@ -129,7 +129,7 @@ export class MsgPackEncoder {
             for(const e of data) {
                 this.encodeElement(e);
             }
-        } else if(data instanceof ArrayBuffer) {
+        } else if(data?.constructor?.name === 'ArrayBuffer') {
             this.packet.encodeBin(new Uint8Array(data));
         } else if(ArrayBuffer.isView(data)) {
             const b = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
