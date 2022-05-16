@@ -1,6 +1,7 @@
 import { BufferBuilder } from "./BufferBuilder";
 import { BufferEncoder } from "./BufferEncoder";
 import { EXTTYPE_STREAM, HEADEROFFSET as HEADERRESERVE, PacketOptions } from "./constants";
+import { MpTypeDef } from "./decorators";
 import { StatsCollector } from "./statsCollector";
 
 export interface MsgPackEncoderOptions {
@@ -9,6 +10,7 @@ export interface MsgPackEncoderOptions {
      */
     EnableStreamTable?: boolean,
     EnablePacketTable?: boolean,
+    EnableTypeHints?: boolean,
     PermitPredefinedObjects?: boolean,
     PageSize?: number,
     InitialStreamTable?: string[],
@@ -52,6 +54,10 @@ export class MsgPackEncoder {
         return false;
     }
 
+    public get UseTypeHints() {
+        return this.options.EnableTypeHints !== false;
+    }
+
 
     constructor(private options: MsgPackEncoderOptions) {
         this.packet = new BufferEncoder(options.PageSize ?? 4096);
@@ -62,7 +68,7 @@ export class MsgPackEncoder {
                 this.StreamTableValue.push(...options.InitialStreamTable);
             this.StreamTableValue.forEach(([v, k]) => {
                 this.StreamTableIndex.set(v, +k);
-            })
+            });
         }
         
     }
@@ -137,8 +143,11 @@ export class MsgPackEncoder {
         } else if(data instanceof Date) {
             this.packet.encodeExtDate(data);
         } else {
+            const typeHint = (this.UseTypeHints && MpTypeDef[data?.constructor?.name]) ? data?.constructor?.name : null;
             if(typeof data.toJSON === 'function')
                 data = data.toJSON();
+            if(typeHint)
+                data['$type'] = typeHint;
             // Map
             const entries = Object.entries(data).filter(([k,x]) => x !== undefined && typeof x !== 'function');
             this.packet.encodeMapHeader(entries.length);

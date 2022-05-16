@@ -1,4 +1,4 @@
-import { MsgPackEncoder, MsgPackDecoder  } from "..";
+import { MsgPackEncoder, MsgPackDecoder, MPType  } from "..";
 import { simple, simple_result } from "./testdata";
 const data = require("../../benchmarks/data");
 
@@ -85,3 +85,22 @@ test('benchtable data "large"', () => {
     expect(r).toStrictEqual(data.large);
 })
 */
+@MPType
+export class Test {
+    static i = 0;
+    constructor() { Test.i++ }
+    data = 42;
+    doSomething() { return 5 }
+}
+
+test('type encoding', () => {
+    const d = new Test();
+    const mp = new MsgPackEncoder({});
+    const res = mp.encodeStream(d);
+    const mpd = new MsgPackDecoder();
+    const r = mpd.decodeStream(res);    
+    expect(r?.data).toBe(42);
+    expect(r?.doSomething?.()).toBe(5);
+    expect(r?.constructor?.name).toBe('Test');
+    expect(Test.i).toBe(1);
+});

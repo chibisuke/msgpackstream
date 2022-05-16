@@ -1,8 +1,10 @@
 import { EXTTYPE_STREAM, PacketOptions } from "./constants";
+import { MpTypeDef } from "./decorators";
 
 export class MsgPackDecoder {
 
     public binaryAsArrayBuffer = false;
+    public decodeTypes = true;
 
     private buffer!: Uint8Array;
     private bufferView!: DataView;
@@ -135,6 +137,12 @@ export class MsgPackDecoder {
         return this.decodeNext();
     }
 
+    createObjectInstance(type: new() => any, data: any) {
+        delete data['$type'];
+        const r =  Object.assign(Object.create(type.prototype), data);
+        return r;
+    }
+
     decodeMap(len: number) {
         const r:any = {};
         for(let i = 0; i < len; i++) {
@@ -142,6 +150,9 @@ export class MsgPackDecoder {
             const key = this.decodeNext();
             this.isTableEntry = false;
             r[key] = this.decodeNext();
+        }
+        if(this.decodeTypes && r['$type'] !== undefined && MpTypeDef[r['$type']]) {
+            return this.createObjectInstance(MpTypeDef[r['$type']], r);
         }
         return r;
     }
