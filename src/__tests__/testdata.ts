@@ -1,3 +1,4 @@
+import moment from 'moment';
 const d = new Date();
 
 export const simple = {

@@ -140,8 +140,10 @@ export class MsgPackEncoder {
         } else if(ArrayBuffer.isView(data)) {
             const b = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
             this.packet.encodeBin(b);
-        } else if(data instanceof Date) {
+        } else if(data.constructor.name === 'Date') {
             this.packet.encodeExtDate(data);
+        } else if(data.constructor.name === 'Moment') {
+            this.packet.encodeExtDate(data.toDate());
         } else {
             const typeHint = (this.UseTypeHints && MpTypeDef[data?.constructor?.name]) ? data?.constructor?.name : null;
             if(typeof data.toJSON === 'function')

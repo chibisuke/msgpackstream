@@ -1,10 +1,12 @@
 import { EXTTYPE_STREAM, PacketOptions } from "./constants";
 import { MpTypeDef } from "./decorators";
+import moment from 'moment';
 
 export class MsgPackDecoder {
 
     public binaryAsArrayBuffer = false;
     public decodeTypes = true;
+    public dateAsMoment = true;
 
     private buffer!: Uint8Array;
     private bufferView!: DataView;
@@ -182,11 +184,19 @@ export class MsgPackDecoder {
             return b.buffer.slice(b.byteOffset, b.byteLength + b.byteOffset);
         return b;
     }
+
+    makeDate(ts: number) {
+        if(!this.dateAsMoment)
+            return new Date(ts*1000);
+        else
+            return moment(new Date(ts*1000))
+    }
+
     decodeExtDate(len: number) {
         if(len === 4) {
             const ts = this.bufferView.getUint32(this.cursor);
             this.cursor += len;
-            return new Date(ts * 1000);
+            return this.makeDate(ts);
         } else if (len === 8) {
             const hi = this.bufferView.getUint32(this.cursor);
             const lo = this.bufferView.getUint32(this.cursor + 4);
@@ -194,13 +204,13 @@ export class MsgPackDecoder {
             const sec = (hi & 0x03) << 32 | lo;
             const ts = sec + (nsec / 1e9);
             this.cursor += len;
-            return new Date(ts * 1000);
+            return this.makeDate(ts);
         } else {
             const nsec = this.bufferView.getUint32(this.cursor);
             const sec = Number(this.bufferView.getBigUint64(this.cursor + 4));
             const ts = sec + (nsec / 1e9);
             this.cursor += len;
-            return new Date(ts * 1000);
+            return this.makeDate(ts);
         }
     }
 

@@ -30,23 +30,26 @@
   },
   "homepage": "https://github.com/chibisuke/msgpackstream#readme",
   "devDependencies": {
+    "@msgpack/msgpack": "^2.7.1",
     "@types/jest": "^27.0.2",
     "@types/node": "^16.10.1",
+    "benchtable": "^0.1.0",
+    "fastestsmallesttextencoderdecoder": "^1.0.22",
     "jest": "^27.2.3",
+    "msgpack-js": "^0.3.0",
+    "msgpack-lite": "^0.1.26",
+    "msgpack5": "^5.3.2",
+    "notepack.io": "^2.3.0",
     "prettier": "^2.4.1",
     "ts-jest": "^27.0.5",
     "tslint": "^6.1.3",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^4.4.3",
-    "notepack.io": "^2.3.0",
-    "msgpack-js": "^0.3.0",
-    "msgpack-lite": "^0.1.26",
-    "msgpack5": "^5.3.2",
-    "benchtable": "^0.1.0",
-    "@msgpack/msgpack": "^2.7.1",
-    "fastestsmallesttextencoderdecoder": "^1.0.22"    
+    "typescript": "^4.4.3"
   },
   "files": [
     "lib/**/*"
-  ]
+  ],
+  "dependencies": {
+    "moment": "^2.29.3"
+  }
 }

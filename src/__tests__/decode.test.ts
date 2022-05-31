@@ -40,6 +40,7 @@ test('Simple decoding', () => {
     const mp = new MsgPackEncoder({ EnableStreamTable: false, PermitPredefinedObjects: false });
     const res = mp.encodeStream(simple);
     const mpd = new MsgPackDecoder();
+    mpd.dateAsMoment = false;
     const r = mpd.decodeStream(res);
     expect(r).toStrictEqual(simple_result);
 });
