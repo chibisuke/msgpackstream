@@ -178,7 +178,7 @@ export class MsgPackDecoder {
         return undefined;
     }
     decodeBin(len: number) {
-        let b = new Uint8Array(this.buffer.buffer, this.buffer.byteOffset + this.cursor, len);
+        const b = new Uint8Array(this.buffer.buffer, this.buffer.byteOffset + this.cursor, len);
         this.cursor += len;
         if(this.binaryAsArrayBuffer)
             return b.buffer.slice(b.byteOffset, b.byteLength + b.byteOffset);

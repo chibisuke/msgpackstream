@@ -33,7 +33,6 @@ export class BufferBuilder {
         if(value instanceof Uint8Array) {
             if(length !== value.length)
                 value = value.subarray(0, length);
-                //value = new Uint8Array(value.buffer, value.byteOffset, length);
             this.checkAvailableSize(value.length);
             this.bufferView.set(value, this.cursor);
             this.cursor += value.length;

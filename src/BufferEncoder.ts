@@ -151,8 +151,8 @@ export class BufferEncoder extends BufferBuilder {
     public encodeExtDate(date: Date) {
         const t = date.getTime();
 
-        let sec = t / 1000 >>> 0;
-        let nsec = (t % 1000) * 1e6;
+        const sec = t / 1000 >>> 0;
+        const nsec = (t % 1000) * 1e6;
 
         if(nsec === 0 && sec < 0x100000000) {
             this.encodeExtHeader(-1, 4);
@@ -196,7 +196,7 @@ export class BufferEncoder extends BufferBuilder {
     }
 
     private encodeInt(data: number) {
-        if(data < 0) { //signed integer
+        if(data < 0) { // signed integer
             if (data >= -0x20) {
                 this.appendOne(data);
             } else if(data >= -0x80) {
@@ -217,7 +217,7 @@ export class BufferEncoder extends BufferBuilder {
                 return this.appendBuffer(this.scratch, 9);               
             }
 
-        } else { //unsinged integer
+        } else { // unsinged integer
             if(data < 0x80) {
                 return this.appendOne(data);
             } else if(data < 0x100) {

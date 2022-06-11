@@ -3,6 +3,7 @@
     "rules": {
         "no-bitwise": false,
         "variable-name": false,
-        "no-var-requires": false
+        "no-var-requires": false,
+        "no-string-literal": false
     }
 }

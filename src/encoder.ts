@@ -90,7 +90,7 @@ export class MsgPackEncoder {
             const payload = this.packet.cursor - this.packet.startOffset;
 
 
-            //TODO: need packet table? 
+            // TODO: need packet table? 
             
             
             if(options & PacketOptions.HasStreamTable) {
@@ -99,7 +99,7 @@ export class MsgPackEncoder {
                     this.packet.encodeString(this.StreamTableValue[i]);
                 }
             }
-            //TODO: write packet table
+            // TODO: write packet table
             this.packet.prependUint(payload);
             this.packet.prependOne(options & 0x7f);
             this.packet.prependExtHeader(EXTTYPE_STREAM, this.packet.cursor - this.packet.startOffset);
