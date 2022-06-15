@@ -6,7 +6,7 @@ export class MsgPackDecoder {
 
     public binaryAsArrayBuffer = false;
     public decodeTypes = true;
-    public dateAsMoment = true;
+    public dateAsMoment = false;
 
     private buffer!: Uint8Array;
     private bufferView!: DataView;
