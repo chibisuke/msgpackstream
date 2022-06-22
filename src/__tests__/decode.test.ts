@@ -37,7 +37,7 @@ test('decode FLOAT', ()  => {
 
 
 test('Simple decoding', () => {
-    const mp = new MsgPackEncoder({ EnableStreamTable: false, PermitPredefinedObjects: false });
+    const mp = new MsgPackEncoder({ EnableStreamTable: false, PermitPredefinedObjects: false, encodeUndefinedAsNull: true });
     const res = mp.encodeStream(simple);
     const mpd = new MsgPackDecoder();
     mpd.dateAsMoment = false;
@@ -104,4 +104,13 @@ test('type encoding', () => {
     expect(r?.doSomething?.()).toBe(5);
     expect(r?.constructor?.name).toBe('Test');
     expect(Test.i).toBe(1);
+});
+
+
+test('undefined encoding', () => {
+    const mp = new MsgPackEncoder({});
+    const res = mp.encodeStream([undefined, 5, undefined]);
+    const mpd = new MsgPackDecoder();
+    const r = mpd.decodeStream(res);   
+    expect(r).toStrictEqual([undefined, 5, undefined]);
 });

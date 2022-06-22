@@ -55,6 +55,7 @@ export class MsgPackDecoder {
     private static ext: {[id: number]: (t: MsgPackDecoder, ...args:any[]) => any} = {
         [this.undef]: (t, len, type) => { throw new Error('ExtType ' + type + ' unknown') },
         0xff: (t, len) => t.decodeExtDate(len),
+        0xfe: () => undefined,
         [EXTTYPE_STREAM]: (t, len, type) => t.decodeStreamExt(len),
     }
 

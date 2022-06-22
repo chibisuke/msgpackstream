@@ -18,6 +18,10 @@ export class BufferEncoder extends BufferBuilder {
         this.appendOne(0xc0);
     }
 
+    public encodeUndef() {
+        this.encodeExtHeader(0xfe, 0);
+    }
+
     public encodeNumber(data: number) {
         if(Number.isInteger(data))
             return this.encodeInt(data);

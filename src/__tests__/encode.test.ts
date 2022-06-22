@@ -23,7 +23,7 @@ test('encode FLOAT', ()  => {
 
 
 test('Simple encoding', () => {
-    const mp = new MsgPackEncoder({ EnableStreamTable: false, PermitPredefinedObjects: false });
+    const mp = new MsgPackEncoder({ EnableStreamTable: false, PermitPredefinedObjects: false, encodeUndefinedAsNull: true });
     const res = mp.encodeStream(simple);
     const r = msgpack.decode(res);
     expect(r).toStrictEqual(simple_result);

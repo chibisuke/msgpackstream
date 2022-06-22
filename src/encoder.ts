@@ -15,6 +15,7 @@ export interface MsgPackEncoderOptions {
     PageSize?: number,
     InitialStreamTable?: string[],
     InitialStreamTableSize?: number
+    encodeUndefinedAsNull?: boolean,
     /* TODO:
         StatsCollector?: StatsCollector,
         InitialStreamTable: (number|string)[] 
@@ -56,6 +57,10 @@ export class MsgPackEncoder {
 
     public get UseTypeHints() {
         return this.options.EnableTypeHints !== false;
+    }
+
+    public get EncodeUndefinedAsNull() {
+        return this.options.encodeUndefinedAsNull === true;
     }
 
 
@@ -120,6 +125,9 @@ export class MsgPackEncoder {
             case 'object':
                 return this.encodeObject(data);
             case 'undefined':
+                if(this.EncodeUndefinedAsNull)
+                    return this.packet.encodeNil();
+                return this.packet.encodeUndef();
             case 'function':
                 return this.packet.encodeNil();
             default:
