@@ -1,12 +1,14 @@
 import { EXTTYPE_STREAM, PacketOptions } from "./constants";
 import { MpTypeDef } from "./decorators";
 import moment from 'moment';
+import { DateTime } from 'luxon';
 
 export class MsgPackDecoder {
 
     public binaryAsArrayBuffer = false;
     public decodeTypes = true;
     public dateAsMoment = false;
+    public dateAsDateTime = false;
 
     private buffer!: Uint8Array;
     private bufferView!: DataView;
@@ -187,6 +189,8 @@ export class MsgPackDecoder {
     }
 
     makeDate(ts: number) {
+        if(!this.dateAsDateTime)
+            return DateTime.fromJSDate(new Date(ts*1000));
         if(!this.dateAsMoment)
             return new Date(ts*1000);
         else

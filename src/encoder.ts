@@ -152,6 +152,8 @@ export class MsgPackEncoder {
             this.packet.encodeExtDate(data);
         } else if(data.constructor.name === 'Moment') {
             this.packet.encodeExtDate(data.toDate());
+        } else if(data.constructor.name === 'DateTime') {
+            this.packet.encodeExtDate(data.toJSDate());            
         } else {
             const typeHint = (this.UseTypeHints && MpTypeDef[data?.constructor?.name]) ? data?.constructor?.name : null;
             if(typeof data.toJSON === 'function')
