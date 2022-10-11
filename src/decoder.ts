@@ -189,7 +189,7 @@ export class MsgPackDecoder {
     }
 
     makeDate(ts: number) {
-        if(!this.dateAsDateTime)
+        if(this.dateAsDateTime)
             return DateTime.fromJSDate(new Date(ts*1000));
         if(!this.dateAsMoment)
             return new Date(ts*1000);

@@ -2,9 +2,9 @@
   "name": "@gymcore/msgpackstream",
   "publishConfig": {
     "access": "public",
-    "registry": "http://git01.ad.gymcore.ag/npm/"
+    "registry": "http://git01.ad.gymcore.ag/api/v4/projects/25/packages/npm/"
   },
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A stream-encoding/decoding version of msgpack that uses string tables to transfer data",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
