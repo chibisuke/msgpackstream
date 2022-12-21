@@ -1,3 +1,4 @@
+import { DateTime, Duration } from "luxon";
 import { BufferBuilder } from "./BufferBuilder";
 import { BufferEncoder } from "./BufferEncoder";
 import { EXTTYPE_STREAM, HEADEROFFSET as HEADERRESERVE, PacketOptions } from "./constants";
@@ -152,8 +153,10 @@ export class MsgPackEncoder {
             this.packet.encodeExtDate(data);
         } else if(data.constructor.name === 'Moment') {
             this.packet.encodeExtDate(data.toDate());
-        } else if(data.constructor.name === 'DateTime') {
+        } else if(DateTime.isDateTime(data)) {
             this.packet.encodeExtDate(data.toJSDate());            
+        } else if(Duration.isDuration(data)) {
+            this.packet.encodeExtDuration(data);
         } else {
             const typeHint = (this.UseTypeHints && MpTypeDef[data?.constructor?.name]) ? data?.constructor?.name : null;
             if(typeof data.toJSON === 'function')

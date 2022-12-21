@@ -1,10 +1,9 @@
 import { EXTTYPE_STREAM, PacketOptions } from "./constants";
 import { MpTypeDef } from "./decorators";
 import moment from 'moment';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 
 export class MsgPackDecoder {
-
     public binaryAsArrayBuffer = false;
     public decodeTypes = true;
     public dateAsMoment = false;
@@ -58,6 +57,7 @@ export class MsgPackDecoder {
         [this.undef]: (t, len, type) => { throw new Error('ExtType ' + type + ' unknown') },
         0xff: (t, len) => t.decodeExtDate(len),
         0xfe: () => undefined,
+        0xfd: (t, len) => t.decodeDuration(len),
         [EXTTYPE_STREAM]: (t, len, type) => t.decodeStreamExt(len),
     }
 
@@ -212,12 +212,18 @@ export class MsgPackDecoder {
             return this.makeDate(ts);
         } else {
             const nsec = this.bufferView.getUint32(this.cursor);
-            const sec = Number(this.bufferView.getBigUint64(this.cursor + 4));
+            const sec = Number(this.bufferView.getBigInt64(this.cursor + 4));
             const ts = sec + (nsec / 1e9);
             this.cursor += len;
             return this.makeDate(ts);
         }
     }
+
+    decodeDuration(len: number): any {
+        const d = this.decodeNext();
+        return Duration.fromISO(d);
+    }
+
 
     decodeStreamExt(len: number) {
         const curEnd = this.cursor + len;

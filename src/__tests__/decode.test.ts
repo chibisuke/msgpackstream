@@ -1,3 +1,4 @@
+import { Duration } from "luxon";
 import { MsgPackEncoder, MsgPackDecoder, MPType  } from "..";
 import { simple, simple_result } from "./testdata";
 const data = require("../../benchmarks/data");
@@ -115,3 +116,23 @@ test('undefined encoding', () => {
     const r = mpd.decodeStream(res);   
     expect(r).toStrictEqual([undefined, 5, undefined]);
 });
+
+test('duration', () => {
+    const d =Duration.fromObject({hours: 5});
+    const mp = new MsgPackEncoder({EnablePacketTable: false, EnableStreamTable: false});
+    const res = mp.encodeStream([d]);
+    const mpd = new MsgPackDecoder();
+    const r = mpd.decodeStream(res);   
+    //console.log(r);
+    //expect(r).toStrictEqual([undefined, 5, undefined]);
+})
+
+test('negative timestamp', () => {
+    const d = new Date(1960, 6, 15);
+    console.log(d);
+    const mp = new MsgPackEncoder({EnablePacketTable: false, EnableStreamTable: false});
+    const res = mp.encodeStream(d);
+    const mpd = new MsgPackDecoder();
+    const r = mpd.decodeStream(res);   
+    console.log(r);
+})

@@ -1,7 +1,7 @@
+import { Duration } from "luxon";
 import { BufferBuilder } from "./BufferBuilder";
 
 export class BufferEncoder extends BufferBuilder {
-
     private b = new ArrayBuffer(20);
     private scratch = new Uint8Array(this.b);
     private scratchDataView = new DataView(this.b);
@@ -29,6 +29,19 @@ export class BufferEncoder extends BufferBuilder {
             this.scratch[0] = 0xcb;
             this.scratchDataView.setFloat64(1, data);
             this.appendBuffer(this.scratch, 9);
+        }
+    }
+
+    public getEncodedStringLen(data: string) {
+        const len = this.utf8Length(data);
+        if(len < 32) {
+            return 1 + len;
+        } else if(len < 0x100) {
+            return 2 + len;
+        } else if(len < 0x10000) {
+            return 3 + len;
+        } else {
+            return 5 + len;
         }
     }
 
@@ -155,14 +168,14 @@ export class BufferEncoder extends BufferBuilder {
     public encodeExtDate(date: Date) {
         const t = date.getTime();
 
-        const sec = t / 1000 >>> 0;
+        const sec = Math.trunc(t / 1000);
         const nsec = (t % 1000) * 1e6;
 
-        if(nsec === 0 && sec < 0x100000000) {
+        if(nsec === 0 && sec < 0x100000000 && t > 0) {
             this.encodeExtHeader(-1, 4);
             this.scratchDataView.setUint32(0, sec);
             this.appendBuffer(this.scratch, 4);
-        } else if(sec < 0x400000000) {
+        } else if(sec < 0x400000000 && t > 0) {
             this.encodeExtHeader(-1, 8);
             const secHi = (sec / 0x100000000) >> 0;
             const secLo = sec & 0xffffffff;
@@ -175,7 +188,12 @@ export class BufferEncoder extends BufferBuilder {
             this.scratchDataView.setBigInt64(4, BigInt(sec));
             this.appendBuffer(this.scratch, 12);
         }
-        
+    }
+
+    public encodeExtDuration(data: Duration) {
+        const d = data.toISO();
+        this.encodeExtHeader(-3, this.getEncodedStringLen(d));
+        this.encodeString(d);
     }
 
     public prependUint(data: number) {
